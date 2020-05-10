@@ -16,6 +16,35 @@ class CartItem extends StatelessWidget {
     return Dismissible(
       key: ValueKey(id),
       direction: DismissDirection.startToEnd,
+      onDismissed: (direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(prodId);
+      },
+      confirmDismiss: (direction) {
+        return showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                  title: Text('Confirm Removal..'),
+                  content: Text(
+                      'Are you sure you want to remove the item from the cart?'),
+                  backgroundColor: Colors.lightBlue,
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('No'),
+                      textColor: Colors.black,
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('Yes'),
+                      textColor: Colors.black,
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    )
+                  ],
+                ));
+      },
       background: Container(
         color: Theme.of(context).errorColor,
         child: Icon(
@@ -27,9 +56,6 @@ class CartItem extends StatelessWidget {
         padding: EdgeInsets.only(left: 10),
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       ),
-      onDismissed: (direction) {
-        Provider.of<Cart>(context, listen: false).removeItem(prodId);
-      },
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(5),
