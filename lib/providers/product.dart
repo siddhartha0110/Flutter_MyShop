@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Product extends ChangeNotifier {
   final String id;
@@ -16,9 +19,24 @@ class Product extends ChangeNotifier {
     @required this.imageUrl,
     this.isFavorite = false,
   });
-
-  void toggleFavoriteStatus() {
-    isFavorite = !isFavorite;
+  void _setFavorite(bool val) {
+    isFavorite = val;
     notifyListeners();
+  }
+
+  Future<void> toggleFavoriteStatus() async {
+    final url = 'https://flutter-shop-62b24.firebaseio.com/products/$id.json';
+    isFavorite = !isFavorite;
+    final oldChoice = isFavorite;
+    notifyListeners();
+    try {
+      final response =
+          await http.patch(url, body: json.encode({'isFavorite': isFavorite}));
+      if (response.statusCode >= 400) {
+        _setFavorite(oldChoice);
+      }
+    } catch (error) {
+      _setFavorite(oldChoice);
+    }
   }
 }
